@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.env
+*.nc
+*.npy
+climate_agent/data/*.png
+climate_agent/data/*.csv
+climate_agent/data/*.json
