@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "climate-agent"
+version = "0.1.0"
+description = "Autonomous Claude agent for climate analysis and tropical cyclone forecasting"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.39.0",
+    "numpy>=1.24.0",
+    "xarray>=2023.1.0",
+    "netCDF4>=1.6.0",
+    "torch>=2.0.0",
+    "matplotlib>=3.7.0",
+    "cartopy>=0.21.0",
+    "requests>=2.28.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+climate-agent = "climate_agent.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["climate_agent*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
