@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Insight | AI-Powered Climate Intelligence</title>
+    <meta name="description" content="Autonomous AI agent for climate analysis, tropical cyclone forecasting, and climate risk assessment. Powered by Claude.">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Nav -->
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">&#127758;</span>
+                <span class="logo-text">Climate<span class="logo-accent">Insight</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/api/docs">API Docs</a>
+                <a href="#waitlist" class="btn btn-secondary btn-sm">Get API Key</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">Powered by Claude &mdash; Anthropic's AI</div>
+            <h1 class="hero-title">
+                Climate Intelligence<br>
+                <span class="gradient-text">at API Speed</span>
+            </h1>
+            <p class="hero-subtitle">
+                An autonomous AI agent that fetches real-time climate data, runs ML forecasts,
+                and delivers actionable insights. One API call. No data pipelines to build.
+            </p>
+            <div class="hero-cta">
+                <a href="#waitlist" class="btn btn-primary btn-lg">Start Free</a>
+                <a href="/api/docs" class="btn btn-outline btn-lg">View API Docs</a>
+            </div>
+            <div class="hero-code">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">One API call. Autonomous analysis.</span>
+                </div>
+<pre><code><span class="kw">curl</span> -X POST https://api.climateinsight.ai/api/v1/agent/query \
+  -H <span class="str">"X-API-Key: clm_your_key"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "query": "Assess climate risk for Miami under SSP5-8.5 by 2100"
+  }'</span>
+
+<span class="cmt"># The agent autonomously:</span>
+<span class="cmt">#   1. Fetches sea surface temperature data</span>
+<span class="cmt">#   2. Analyzes atmospheric conditions</span>
+<span class="cmt">#   3. Runs multi-hazard risk model</span>
+<span class="cmt">#   4. Returns structured risk assessment</span></code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logos / Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <p class="social-proof-label">Built on trusted data sources</p>
+            <div class="logo-row">
+                <span class="partner-logo">NOAA</span>
+                <span class="partner-logo">IBTrACS</span>
+                <span class="partner-logo">IPCC AR6</span>
+                <span class="partner-logo">NASA GISS</span>
+                <span class="partner-logo">NSIDC</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Everything You Need for<br><span class="gradient-text">Climate Intelligence</span></h2>
+            <p class="section-subtitle">16 tools. One autonomous agent. Zero infrastructure to manage.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">&#127744;</div>
+                    <h3>Tropical Cyclone Tracking</h3>
+                    <p>Real-time active storm data from NOAA NHC. Historical records from IBTrACS spanning 1850-present across all ocean basins.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#127777;&#65039;</div>
+                    <h3>Climate Indicators</h3>
+                    <p>Live CO2 concentration, global temperature anomaly, sea level rise, and Arctic sea ice extent with trend analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128200;</div>
+                    <h3>AI Forecasting</h3>
+                    <p>SHIPS-like intensity prediction, beta-advection track forecasting, and rapid intensification probability assessment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#9888;&#65039;</div>
+                    <h3>Risk Assessment</h3>
+                    <p>Multi-hazard climate risk under all four IPCC SSP scenarios. Cyclone, sea level, heat, and precipitation risk profiles.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#127760;</div>
+                    <h3>Carbon Budget</h3>
+                    <p>Remaining carbon budget calculations for 1.5C and 2.0C targets with net-zero pathway modeling.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128506;</div>
+                    <h3>Visualization</h3>
+                    <p>Auto-generated storm track maps, SST charts, and climate time series with Cartopy geospatial rendering.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Ask a Question</h3>
+                    <p>Send any climate-related query in natural language via the API.</p>
+                </div>
+                <div class="step-arrow">&rarr;</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Agent Reasons</h3>
+                    <p>Claude autonomously selects which tools to call and in what order.</p>
+                </div>
+                <div class="step-arrow">&rarr;</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Tools Execute</h3>
+                    <p>Real data is fetched, models run, analysis computed, visualizations generated.</p>
+                </div>
+                <div class="step-arrow">&rarr;</div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Get Results</h3>
+                    <p>Receive a structured, cited response with data, analysis, and recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="use-cases">
+        <div class="container">
+            <h2 class="section-title">Built For</h2>
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <h3>Insurance & Reinsurance</h3>
+                    <p>Assess tropical cyclone exposure, model climate-adjusted loss projections, and price catastrophe risk under warming scenarios.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>Energy & Utilities</h3>
+                    <p>Forecast storm-related outage risk, optimize renewable siting with climate projections, and plan grid resilience investments.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>Government & Defense</h3>
+                    <p>Climate risk briefings for infrastructure planning, disaster preparedness, and long-term coastal adaptation strategy.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>Research & Academia</h3>
+                    <p>Rapid prototyping of climate analyses, literature-grounded data exploration, and teaching tool for atmospheric science.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <h2 class="section-title">Simple, Transparent Pricing</h2>
+            <p class="section-subtitle">Start free. Scale as you grow.</p>
+            <div class="pricing-grid">
+                {% for plan in plans %}
+                <div class="pricing-card {% if plan.id == 'professional' %}featured{% endif %}">
+                    {% if plan.id == 'professional' %}<div class="pricing-badge">Most Popular</div>{% endif %}
+                    <h3 class="pricing-name">{{ plan.name }}</h3>
+                    <div class="pricing-price">{{ plan.price.monthly_display }}</div>
+                    <p class="pricing-desc">{{ plan.description }}</p>
+                    <ul class="pricing-features">
+                        <li>{{ "{:,}".format(plan.limits.requests_per_month) }} requests/month</li>
+                        <li>{{ plan.limits.requests_per_minute }} requests/minute</li>
+                        <li>{{ plan.limits.agent_turns_per_request }} agent turns/request</li>
+                        <li>{% if plan.features.forecasting %}&#10003; Forecasting tools{% else %}&#10007; Forecasting tools{% endif %}</li>
+                        <li>{% if plan.features.visualizations %}&#10003; Visualization tools{% else %}&#10007; Visualization tools{% endif %}</li>
+                        <li>{% if plan.features.priority_support %}&#10003; Priority support{% else %}&#10007; Priority support{% endif %}</li>
+                    </ul>
+                    {% if plan.id == 'enterprise' %}
+                    <a href="#waitlist" class="btn btn-outline btn-block">Contact Sales</a>
+                    {% elif plan.id == 'free' %}
+                    <a href="#waitlist" class="btn btn-secondary btn-block">Get Started Free</a>
+                    {% else %}
+                    <a href="#waitlist" class="btn btn-primary btn-block">Start Trial</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Waitlist / CTA -->
+    <section id="waitlist" class="waitlist">
+        <div class="container">
+            <h2 class="section-title">Get Your API Key</h2>
+            <p class="section-subtitle">Start building with climate intelligence today.</p>
+            <form id="waitlist-form" class="waitlist-form">
+                <div class="form-row">
+                    <input type="email" id="email" placeholder="you@company.com" required>
+                    <input type="text" id="company" placeholder="Company (optional)">
+                </div>
+                <input type="text" id="use_case" placeholder="What will you build? (optional)" class="form-full">
+                <button type="submit" class="btn btn-primary btn-lg">Get Early Access</button>
+                <p class="form-note">Free tier available immediately. No credit card required.</p>
+            </form>
+            <div id="waitlist-success" class="waitlist-success" style="display:none;">
+                <h3>You're in!</h3>
+                <p>Check your email for your API key and getting started guide.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <span class="logo-icon">&#127758;</span>
+                <span class="logo-text">Climate<span class="logo-accent">Insight</span></span>
+                <p class="footer-tagline">AI-powered climate intelligence</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="/api/docs">API Docs</a>
+                    <a href="/api/redoc">API Reference</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#">About</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Data Processing</a>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Climate Insight. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
