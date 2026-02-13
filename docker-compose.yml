@@ -1,0 +1,8 @@
+services:
+  oncologyml:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
