@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import traceback
+from typing import Callable
 
 from cancer_agent.data import DatasetLoader, Preprocessor
 from cancer_agent.analysis import DataExplorer
@@ -25,6 +26,15 @@ DISCLAIMER = (
     "treatment recommendations, or replace professional medical advice. "
     "All outputs are for research and educational purposes only."
 )
+
+STAGES = [
+    "Data Loading",
+    "Exploratory Analysis",
+    "Preprocessing",
+    "Model Training",
+    "Evaluation",
+    "Report Generation",
+]
 
 
 class CancerResearchAgent:
@@ -48,6 +58,7 @@ class CancerResearchAgent:
         test_size: float = 0.2,
         cv_folds: int = 5,
         output_dir: str = "cancer_agent_output",
+        on_progress: Callable[[int, int, str], None] | None = None,
     ):
         self.dataset_name = dataset
         self.model_names = models
@@ -55,6 +66,7 @@ class CancerResearchAgent:
         self.test_size = test_size
         self.cv_folds = cv_folds
         self.output_dir = output_dir
+        self.on_progress = on_progress
 
         # Pipeline state
         self._raw_data = None
@@ -63,6 +75,11 @@ class CancerResearchAgent:
         self._training_results = None
         self._evaluation_results = None
         self._report = None
+
+    def _notify(self, stage_index: int, stage_name: str):
+        """Call the progress callback if one was provided."""
+        if self.on_progress:
+            self.on_progress(stage_index, len(STAGES), stage_name)
 
     def run(self) -> dict:
         """
@@ -77,24 +94,26 @@ class CancerResearchAgent:
         log.info(DISCLAIMER)
         log.info("")
 
-        stages = [
-            ("1/6 Data Loading", self._stage_load),
-            ("2/6 Exploratory Analysis", self._stage_eda),
-            ("3/6 Preprocessing", self._stage_preprocess),
-            ("4/6 Model Training", self._stage_train),
-            ("5/6 Evaluation", self._stage_evaluate),
-            ("6/6 Report Generation", self._stage_report),
+        stage_fns = [
+            self._stage_load,
+            self._stage_eda,
+            self._stage_preprocess,
+            self._stage_train,
+            self._stage_evaluate,
+            self._stage_report,
         ]
 
-        for stage_name, stage_fn in stages:
+        for i, (name, stage_fn) in enumerate(zip(STAGES, stage_fns)):
+            label = f"{i+1}/{len(STAGES)} {name}"
             log.info("")
             log.info("-" * 60)
-            log.info("STAGE: %s", stage_name)
+            log.info("STAGE: %s", label)
             log.info("-" * 60)
+            self._notify(i + 1, name)
             try:
                 stage_fn()
             except Exception:
-                log.error("Stage '%s' failed:\n%s", stage_name, traceback.format_exc())
+                log.error("Stage '%s' failed:\n%s", label, traceback.format_exc())
                 raise
 
         return self._report
