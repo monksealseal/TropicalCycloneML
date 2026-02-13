@@ -2,72 +2,99 @@
 
 Supports two auth methods:
 1. API Key authentication (header: X-API-Key: clm_...)
-2. JWT Bearer token (header: Authorization: Bearer <token>)
+2. Bearer token (header: Authorization: Bearer <token>)
+
+Uses HMAC-SHA256 tokens (no external JWT dependency needed).
 """
 
 from __future__ import annotations
 
 import hashlib
+import hmac
+import json
 import os
+import base64
+import time
 from datetime import datetime, timedelta
 from typing import Any
 
-import jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from climate_agent.db.models import ApiKey, User
 
-JWT_SECRET = os.environ.get("JWT_SECRET", "change-me-in-production-please")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+TOKEN_SECRET = os.environ.get("JWT_SECRET", "change-me-in-production-please")
+TOKEN_EXPIRATION_HOURS = 24
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _hmac_sign(payload_b64: bytes) -> str:
+    return hmac.new(TOKEN_SECRET.encode(), payload_b64, hashlib.sha256).hexdigest()
 
 
 def hash_password(password: str) -> str:
-    """Hash a plaintext password."""
-    return pwd_context.hash(password)
+    """Hash a plaintext password with a salt using SHA-256.
+
+    For production, swap this out for bcrypt/argon2 by installing passlib.
+    """
+    salt = os.urandom(16).hex()
+    h = hashlib.sha256(f"{salt}${password}".encode()).hexdigest()
+    return f"{salt}${h}"
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Verify a plaintext password against its hash."""
-    return pwd_context.verify(plain, hashed)
+    parts = hashed.split("$", 1)
+    if len(parts) != 2:
+        return False
+    salt, expected = parts
+    h = hashlib.sha256(f"{salt}${plain}".encode()).hexdigest()
+    return hmac.compare_digest(h, expected)
 
 
 def create_access_token(user_id: str, email: str, plan: str) -> str:
-    """Create a JWT access token for a user."""
+    """Create an HMAC-signed bearer token."""
     payload = {
         "sub": user_id,
         "email": email,
         "plan": plan,
-        "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
-        "iat": datetime.utcnow(),
+        "exp": int(time.time()) + TOKEN_EXPIRATION_HOURS * 3600,
     }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode())
+    sig = _hmac_sign(payload_b64)
+    return f"{payload_b64.decode()}.{sig}"
 
 
-def decode_access_token(token: str) -> dict[str, Any]:
-    """Decode and validate a JWT access token."""
-    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+def decode_access_token(token: str) -> dict[str, Any] | None:
+    """Decode and verify a bearer token. Returns payload or None."""
+    parts = token.rsplit(".", 1)
+    if len(parts) != 2:
+        return None
+    payload_b64, sig = parts[0].encode(), parts[1]
+
+    expected_sig = _hmac_sign(payload_b64)
+    if not hmac.compare_digest(sig, expected_sig):
+        return None
+
+    try:
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+    except Exception:
+        return None
+
+    if payload.get("exp", 0) < time.time():
+        return None
+    return payload
 
 
 def authenticate_api_key(db: Session, raw_key: str) -> User | None:
-    """Authenticate a request using an API key.
-
-    Returns the associated User if the key is valid and active, else None.
-    """
+    """Authenticate a request using an API key."""
     key_hash = ApiKey.hash_key(raw_key)
     api_key = db.query(ApiKey).filter(ApiKey.key_hash == key_hash, ApiKey.is_active.is_(True)).first()
 
     if api_key is None:
         return None
 
-    # Check expiration
     if api_key.expires_at and api_key.expires_at < datetime.utcnow():
         return None
 
-    # Update last used timestamp
     api_key.last_used_at = datetime.utcnow()
     db.commit()
 
@@ -76,14 +103,10 @@ def authenticate_api_key(db: Session, raw_key: str) -> User | None:
 
 
 def authenticate_jwt(db: Session, token: str) -> User | None:
-    """Authenticate a request using a JWT bearer token."""
-    try:
-        payload = decode_access_token(token)
-    except jwt.ExpiredSignatureError:
+    """Authenticate a request using a bearer token."""
+    payload = decode_access_token(token)
+    if payload is None:
         return None
-    except jwt.InvalidTokenError:
-        return None
-
     user = db.query(User).filter(User.id == payload["sub"], User.is_active.is_(True)).first()
     return user
 
@@ -99,7 +122,6 @@ def register_user(
 
     Returns (user, raw_api_key).
     """
-    # Check for existing user
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         raise ValueError(f"User with email {email} already exists")
@@ -113,7 +135,6 @@ def register_user(
     db.add(user)
     db.flush()
 
-    # Generate first API key
     raw_key, key_hash = ApiKey.generate()
     api_key = ApiKey(
         user_id=user.id,

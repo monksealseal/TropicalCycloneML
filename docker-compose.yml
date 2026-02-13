@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./climate_agent/data:/app/climate_agent/data
+    restart: unless-stopped

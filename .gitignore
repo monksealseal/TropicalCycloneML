@@ -6,6 +6,8 @@ build/
 .eggs/
 *.egg
 .env
+*.db
+climate_agent.db
 *.nc
 *.npy
 climate_agent/data/*.png
