@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraScore — AI Suitability Assessment for Earth Science</title>
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --surface: #121927;
+            --surface-2: #1a2332;
+            --border: #243044;
+            --text: #e2e8f0;
+            --text-dim: #8899aa;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .logo span { color: var(--text-dim); font-weight: 400; }
+        nav .links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        nav .links a:hover { color: var(--text); }
+        .cta-btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+        .cta-btn:hover { opacity: 0.9; }
+
+        /* Hero */
+        .hero {
+            padding: 10rem 3rem 5rem;
+            text-align: center;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        .hero .badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 0.3rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            max-width: 640px;
+            margin: 0 auto 2.5rem;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-actions a {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        /* Problem statement */
+        .problem {
+            max-width: 780px;
+            margin: 0 auto 5rem;
+            padding: 2rem 3rem;
+            text-align: center;
+        }
+        .problem blockquote {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            font-style: italic;
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        /* Live demo */
+        .demo-section {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            padding: 0 3rem;
+        }
+        .demo-section h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .demo-section .subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+        .demo-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .demo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .demo-header .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #22c55e; }
+        .demo-body {
+            padding: 1.5rem;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+        .demo-body .comment { color: #6b7b8d; }
+        .demo-body .key { color: #8b5cf6; }
+        .demo-body .str { color: #22c55e; }
+        .demo-body .num { color: #f59e0b; }
+        .demo-body .response { color: var(--accent); }
+
+        /* Results display */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 3rem auto 5rem;
+            padding: 0 3rem;
+        }
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+        }
+        .result-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--surface-2);
+            border-radius: 4px;
+            margin: 0.75rem 0;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        .rec-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .rec-proceed { background: rgba(34,197,94,0.15); color: var(--green); }
+        .rec-caution { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .rec-hybrid { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+        .rec-no { background: rgba(239,68,68,0.15); color: var(--red); }
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--mono);
+        }
+
+        /* Dimensions */
+        .dimensions-section {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            padding: 0 3rem;
+        }
+        .dimensions-section h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .dimensions-section .subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+        }
+        .dim-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        .dim-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        .dim-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .dim-card h4 {
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+        .dim-card p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* How it works */
+        .how-section {
+            max-width: 860px;
+            margin: 0 auto 5rem;
+            padding: 0 3rem;
+        }
+        .how-section h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+        .steps {
+            display: flex;
+            gap: 2rem;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+        }
+        .step-num {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+        .step h4 { margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .step p { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Pricing */
+        .pricing-section {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            padding: 0 3rem;
+        }
+        .pricing-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 2.5rem; }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .price-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .price-card.featured { border-color: var(--accent); }
+        .price-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+        }
+        .price-amount span { font-size: 1rem; color: var(--text-dim); font-weight: 400; }
+        .price-card ul {
+            list-style: none;
+            text-align: left;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .price-card li {
+            padding: 0.4rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+        .price-card li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.65rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .price-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+        .price-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .price-btn.primary { background: var(--accent); border-color: var(--accent); }
+        .price-btn.primary:hover { opacity: 0.9; color: #fff; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 3rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .dim-grid { grid-template-columns: 1fr 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .steps { flex-direction: column; }
+            nav { padding: 1rem 1.5rem; }
+            .hero, .demo-section, .dimensions-section,
+            .how-section, .pricing-section, .results-grid, .problem { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">TerraScore <span>| API</span></div>
+    <div class="links">
+        <a href="#demo">Demo</a>
+        <a href="#dimensions">Framework</a>
+        <a href="#how">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/api/v1/dimensions" class="cta-btn">API Docs</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="badge">AI Decision Intelligence for Earth Science</div>
+    <h1>Know <em>before you build</em> if AI is the right tool</h1>
+    <p>
+        A mathematically rigorous framework that scores the suitability of deep learning
+        for your earth science problem across 8 dimensions and 11 decision gates.
+        Stop wasting compute on problems physics already solves.
+    </p>
+    <div class="hero-actions">
+        <a href="#demo" class="btn-primary">Try the API</a>
+        <a href="#how" class="btn-secondary">See the Framework</a>
+    </div>
+</section>
+
+<!-- Problem statement -->
+<section class="problem">
+    <blockquote>
+        In an age where it seems AI is the first tool used for any problem, the development
+        of a heuristic model for making a well founded decision related to the use of AI in
+        earth science problems would be greatly beneficial to the academic community and
+        private industry.
+    </blockquote>
+</section>
+
+<!-- Live demo -->
+<section class="demo-section" id="demo">
+    <h2>One API call. Actionable insight.</h2>
+    <p class="subtitle">Submit your problem specification, get a scored assessment in milliseconds</p>
+    <div class="demo-card">
+        <div class="demo-header">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            POST /api/v1/assess
+        </div>
+        <div class="demo-body">
+<span class="comment"># Assess weather forecasting suitability for ML</span>
+curl -X POST https://api.terrascore.io/api/v1/assess \
+  -H <span class="str">"X-API-Key: {{ demo_key }}"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    <span class="key">"name"</span>: <span class="str">"Global Weather Forecasting"</span>,
+    <span class="key">"target_timescale"</span>: <span class="str">"weather"</span>,
+    <span class="key">"training_data_type"</span>: <span class="str">"reanalysis"</span>,
+    <span class="key">"reanalysis_quality"</span>: <span class="num">0.92</span>,
+    <span class="key">"signal_to_noise_ratio"</span>: <span class="num">8.0</span>,
+    <span class="key">"physics_model_cost"</span>: <span class="num">0.80</span>,
+    <span class="key">"inference_speedup_factor"</span>: <span class="num">1000</span>
+  }'</span>
+
+<span class="comment"># Response:</span>
+<span class="response">{
+  "score": 0.756,
+  "recommendation": "proceed",
+  "approach": "end_to_end_ml",
+  "suitability_class": "strong_candidate",
+  "gate_status": "pass"
+}</span>
+        </div>
+    </div>
+</section>
+
+<!-- Example results -->
+<section>
+    <div class="results-grid" id="results">
+        <div class="result-card">
+            <h3>Weather Forecasting (1-10 day)</h3>
+            <div class="score-value" style="color: var(--green);">0.756</div>
+            <div class="score-bar"><div class="score-fill" style="width:75.6%; background: var(--green);"></div></div>
+            <span class="rec-tag rec-proceed">Proceed with ML</span>
+        </div>
+        <div class="result-card">
+            <h3>ML-Enhanced Data Assimilation</h3>
+            <div class="score-value" style="color: var(--green);">0.706</div>
+            <div class="score-bar"><div class="score-fill" style="width:70.6%; background: var(--green);"></div></div>
+            <span class="rec-tag rec-proceed">Proceed with ML</span>
+        </div>
+        <div class="result-card">
+            <h3>Cloud Microphysics Parameterization</h3>
+            <div class="score-value" style="color: var(--amber);">0.651</div>
+            <div class="score-bar"><div class="score-fill" style="width:65.1%; background: var(--amber);"></div></div>
+            <span class="rec-tag rec-caution">Proceed with Caution</span>
+        </div>
+        <div class="result-card">
+            <h3>Tropical Cyclone Intensity</h3>
+            <div class="score-value" style="color: #8b5cf6;">0.591</div>
+            <div class="score-bar"><div class="score-fill" style="width:59.1%; background: #8b5cf6;"></div></div>
+            <span class="rec-tag rec-hybrid">Hybrid Physics-ML</span>
+        </div>
+        <div class="result-card">
+            <h3>Climate Projection (SSP Scenarios)</h3>
+            <div class="score-value" style="color: var(--red);">0.449</div>
+            <div class="score-bar"><div class="score-fill" style="width:44.9%; background: var(--red);"></div></div>
+            <span class="rec-tag rec-no">ML Not Recommended</span>
+        </div>
+        <div class="result-card">
+            <h3>Oceanic Tidal Prediction</h3>
+            <div class="score-value" style="color: var(--red);">0.820</div>
+            <div class="score-bar"><div class="score-fill" style="width:82.0%; background: var(--red);"></div></div>
+            <span class="rec-tag rec-no">Gate Override: Analytical Solution Exists</span>
+        </div>
+    </div>
+</section>
+
+<!-- 8 Dimensions -->
+<section class="dimensions-section" id="dimensions">
+    <h2>8 Scoring Dimensions</h2>
+    <p class="subtitle">Each dimension is scored [0, 1] with confidence weighting. Combined into a composite suitability index.</p>
+    <div class="dim-grid">
+        <div class="dim-card">
+            <div class="icon">D<sub>f</sub></div>
+            <h4>Data Fidelity</h4>
+            <p>Reanalysis quality, coverage, resolution, known biases. ERA5-level data scores highest.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">P<sub>l</sub></div>
+            <h4>Problem Learnability</h4>
+            <p>Signal-to-noise ratio, stationarity, effective dimensionality, OOD deployment risk.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">V<sub>a</sub></div>
+            <h4>Sample Sufficiency</h4>
+            <p>Data volume vs model complexity. Rare event penalty for TCs, blocking events.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">B<sub>c</sub></div>
+            <h4>Physics Baseline</h4>
+            <p>Current physics model skill, theoretical limits, marginal ML improvement potential.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">C<sub>j</sub></div>
+            <h4>Computational Justification</h4>
+            <p>Training cost amortization, inference speedup, tensor core alignment.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">P<sub>c</sub></div>
+            <h4>Physical Consistency</h4>
+            <p>Conservation laws, symmetry requirements, multiscale coupling enforceability.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">U<sub>q</sub></div>
+            <h4>Uncertainty Quantification</h4>
+            <p>Calibration needs, ensemble feasibility, probabilistic output requirements.</p>
+        </div>
+        <div class="dim-card">
+            <div class="icon">E<sub>r</sub></div>
+            <h4>Extrapolation Risk</h4>
+            <p>OOD fraction, non-stationarity, forcing novelty, tipping point proximity.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="how-section" id="how">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <h4>Specify</h4>
+            <p>Describe your problem: data source, timescale, physical constraints, and objectives.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <h4>Score</h4>
+            <p>8 dimensions scored mathematically. 11 heuristic gates check for fundamental barriers.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <h4>Decide</h4>
+            <p>Get a recommendation: end-to-end ML, hybrid physics-ML, parameterization, or physics-only.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing-section" id="pricing">
+    <h2>Pricing</h2>
+    <div class="pricing-grid">
+        <div class="price-card">
+            <h3>Explorer</h3>
+            <div class="price-amount">$0 <span>/ month</span></div>
+            <ul>
+                <li>10 assessments per day</li>
+                <li>Single problem per request</li>
+                <li>Default weight profile</li>
+                <li>Full dimension + gate scores</li>
+                <li>Community support</li>
+            </ul>
+            <a href="/api/v1/keys/generate" class="price-btn">Get Free API Key</a>
+        </div>
+        <div class="price-card featured">
+            <h3>Professional</h3>
+            <div class="price-amount">$99 <span>/ month</span></div>
+            <ul>
+                <li>500 assessments per day</li>
+                <li>Batch compare up to 10 problems</li>
+                <li>All weight profiles (operational, climate, discovery)</li>
+                <li>Priority support</li>
+                <li>Custom dimension weights</li>
+            </ul>
+            <a href="/api/v1/keys/generate" class="price-btn primary">Start Free Trial</a>
+        </div>
+        <div class="price-card">
+            <h3>Enterprise</h3>
+            <div class="price-amount">Custom</div>
+            <ul>
+                <li>50,000 assessments per day</li>
+                <li>Batch compare up to 100 problems</li>
+                <li>Custom heuristic gates</li>
+                <li>On-premise deployment option</li>
+                <li>Dedicated support + SLA</li>
+            </ul>
+            <a href="mailto:sales@terrascore.io" class="price-btn">Contact Sales</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    TerraScore — AI Suitability Assessment for Earth Science.
+    Built on peer-reviewed methodology from the Workshop on Mathematics and Machine Learning for Earth System Simulation.
+</footer>
+
+</body>
+</html>
