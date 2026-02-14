@@ -1,2 +1,5 @@
 requests>=2.28
 gradio_client>=0.7
+fastapi>=0.104
+uvicorn[standard]>=0.24
+stripe>=7.0
