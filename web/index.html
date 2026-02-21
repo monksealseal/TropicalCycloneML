@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TropicalCycloneML - Live Cyclone Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>TropicalCycloneML</h1>
+            <p class="subtitle">Real-Time Tropical Cyclone Tracking & Analysis</p>
+        </div>
+        <div class="header-controls">
+            <select id="basin-filter">
+                <option value="all">All Basins</option>
+                <option value="NA">North Atlantic</option>
+                <option value="EP">East Pacific</option>
+                <option value="WP">West Pacific</option>
+                <option value="NI">North Indian</option>
+                <option value="SI">South Indian</option>
+                <option value="SP">South Pacific</option>
+            </select>
+            <button id="refresh-btn" title="Refresh Data">Refresh</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <div class="map-container">
+                <div id="map"></div>
+                <div id="map-overlay" class="map-overlay">
+                    <span id="storm-count">0</span> active storms tracked
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="panel" id="active-storms-panel">
+                    <h2>Active Storms</h2>
+                    <div id="active-storms-list" class="storm-list">
+                        <div class="loading">Loading storm data...</div>
+                    </div>
+                </div>
+
+                <div class="panel" id="stats-panel">
+                    <h2>Season Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value" id="total-storms">--</span>
+                            <span class="stat-label">Named Storms</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="total-hurricanes">--</span>
+                            <span class="stat-label">Hurricanes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="total-major">--</span>
+                            <span class="stat-label">Major (Cat 3+)</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="max-wind">--</span>
+                            <span class="stat-label">Peak Wind (kt)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" id="storm-detail-panel" style="display:none;">
+                    <h2>Storm Detail</h2>
+                    <div id="storm-detail-content"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Data: <a href="https://www.nhc.noaa.gov/" target="_blank">NOAA NHC</a> |
+           Source: <a href="https://github.com/monksealseal/TropicalCycloneML" target="_blank">GitHub</a> |
+           Built with Claude Code</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
